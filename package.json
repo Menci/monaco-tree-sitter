@@ -1,0 +1,34 @@
+{
+  "name": "monaco-tree-sitter",
+  "version": "0.0.1",
+  "description": "Highlight your Monaco Editor with tree-sitter grammar.",
+  "main": "lib/index.js",
+  "repository": "https://github.com/Menci/monaco-tree-sitter",
+  "author": "Menci <huanghaorui301@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "lodash.debounce": "^4.0.8",
+    "web-tree-sitter": "^0.16.2"
+  },
+  "devDependencies": {
+    "@types/lodash.debounce": "^4.0.6",
+    "cz-conventional-changelog": "3.1.0",
+    "monaco-editor": "^0.20.0",
+    "prettier": "^1.19.1",
+    "typescript": "^3.8.3"
+  },
+  "scripts": {
+    "format": "prettier --write \"src/**/*.ts\" \"demo/*.js\"",
+    "build": "tsc -p ."
+  },
+  "files": [
+    "/lib",
+    "/themes",
+    "/grammars"
+  ],
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  }
+}
