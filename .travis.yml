@@ -2,4 +2,4 @@
 language: node_js
 node_js:
   - lts/*
-script: yarn build && cd demo && yarn build
+script: yarn build && cd demo && yarn && yarn build
