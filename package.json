@@ -1,6 +1,6 @@
 {
   "name": "monaco-tree-sitter",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Highlight your Monaco Editor with tree-sitter grammar.",
   "main": "lib/index.js",
   "repository": "https://github.com/Menci/monaco-tree-sitter",
