@@ -45,10 +45,12 @@ export function highlight(
         terms.map(term => [term, getCssClassName ? escapeHtml(getCssClassName(term), true) : `mts-${term}`])
       ) as any);
 
+  // TODO: Use a tree-traversal based algorithm to handle nested terms.
   let currentIndex = 0,
     result = "";
   for (const { term, startIndex, endIndex } of highlightInfo) {
     if (startIndex > currentIndex) result += escapeHtml(code.substring(currentIndex, startIndex));
+    if (startIndex < currentIndex) continue;
 
     const text = code.substring(startIndex, endIndex);
     if (useInlineStyle) result += `<span style="${Theme.generateStyleOfTerm(term)}">${escapeHtml(text)}</span>`;
