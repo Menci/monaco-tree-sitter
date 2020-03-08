@@ -1,5 +1,6 @@
 import Parser = require("web-tree-sitter");
-import Monaco = require("monaco-editor/esm/vs/editor/editor.api");
+import MonacoModule = require("monaco-editor");
+import { Monaco } from "./monaco";
 import { Language } from "./language";
 
 export type Term =
@@ -113,7 +114,9 @@ export function buildHighlightInfo(tree: Parser.Tree, language: Language) {
 }
 
 export function buildDecorations(tree: Parser.Tree, language: Language) {
-  const decorations: Record<Term, Monaco.Range[]> = Object.fromEntries(terms.map(term => [term, []])) as any;
+  if (!Monaco) throw new TypeError("Please provide the monaco-editor module via provideMonacoModule() first.");
+
+  const decorations: Record<Term, MonacoModule.Range[]> = Object.fromEntries(terms.map(term => [term, []])) as any;
 
   const highlightInfo = buildHighlightInfo(tree, language);
   for (const { term, node } of highlightInfo) {

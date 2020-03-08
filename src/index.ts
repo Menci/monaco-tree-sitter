@@ -1,31 +1,35 @@
 import Parser = require("web-tree-sitter");
-import Monaco = require("monaco-editor/esm/vs/editor/editor.api");
+import MonacoModule = require("monaco-editor");
 import lodashDebounce = require("lodash.debounce");
 
 import { Language } from "./language";
 import { buildDecorations, Term } from "./highlighter";
 import { Theme } from "./theme";
+import { provideMonacoModule } from "./monaco";
 
 export * from "./theme";
 export * from "./language";
 export * from "./highlighter";
 export * from "./highlight";
 
-function monacoPositionToParserPoint(position: Monaco.Position): Parser.Point {
+function monacoPositionToParserPoint(position: MonacoModule.Position): Parser.Point {
   return { row: position.lineNumber, column: position.column };
 }
 
-export class MonacoTreeSitter implements Monaco.IDisposable {
+export class MonacoTreeSitter implements MonacoModule.IDisposable {
   private tree: Parser.Tree;
   private monacoDecorationKeys: string[] = [];
   private buildHighlightDebounced: () => void;
   public dispose: () => void;
 
   constructor(
-    public readonly editor: Monaco.editor.IStandaloneCodeEditor,
+    Monaco: typeof MonacoModule,
+    public readonly editor: MonacoModule.editor.IStandaloneCodeEditor,
     private language: Language,
     debounceUpdate: number = 15
   ) {
+    provideMonacoModule(Monaco);
+
     this.tree = language.parser.parse(editor.getValue());
     this.buildHighlightDebounced =
       debounceUpdate == null ? this.buildHighlight : lodashDebounce(this.buildHighlight.bind(this), debounceUpdate);
@@ -36,7 +40,7 @@ export class MonacoTreeSitter implements Monaco.IDisposable {
     this.buildHighlight();
   }
 
-  private onEditorContentChange(e: Monaco.editor.IModelContentChangedEvent) {
+  private onEditorContentChange(e: MonacoModule.editor.IModelContentChangedEvent) {
     if (e.changes.length == 0) return;
 
     for (const change of e.changes) {
@@ -55,9 +59,9 @@ export class MonacoTreeSitter implements Monaco.IDisposable {
   private buildHighlight() {
     const decorations = buildDecorations(this.tree, this.language);
 
-    const monacoDecorations: Monaco.editor.IModelDeltaDecoration[] = [];
+    const monacoDecorations: MonacoModule.editor.IModelDeltaDecoration[] = [];
     for (const [term, ranges] of Object.entries(decorations)) {
-      const options: Monaco.editor.IModelDecorationOptions = {
+      const options: MonacoModule.editor.IModelDecorationOptions = {
         inlineClassName: Theme.getClassNameOfTerm(term as Term)
       };
       for (const range of ranges) {

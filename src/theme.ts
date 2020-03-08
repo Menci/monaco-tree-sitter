@@ -1,4 +1,5 @@
-import Monaco = require("monaco-editor/esm/vs/editor/editor.api");
+import MonacoModule = require("monaco-editor");
+import { Monaco } from "./monaco";
 
 import { Term } from "./highlighter";
 
@@ -11,12 +12,12 @@ export interface ThemeConfig {
         extraCssStyles?: string;
       }
   >;
-  base: Monaco.editor.IStandaloneThemeData;
+  base: MonacoModule.editor.IStandaloneThemeData;
 }
 
 export class Theme {
   private static tag: HTMLStyleElement;
-  private static config: ThemeConfig;
+  public static config: ThemeConfig;
   private static readonly cssClassNamePrefix = "mts-";
 
   private constructor() {}
@@ -33,8 +34,10 @@ export class Theme {
    * @param config The JSON.parse()-ed theme config.
    */
   public static load(config: ThemeConfig) {
-    Monaco.editor.defineTheme("monaco-tree-sitter", config.base);
-    Monaco.editor.setTheme("monaco-tree-sitter");
+    if (Monaco) {
+      Monaco.editor.defineTheme("monaco-tree-sitter", config.base);
+      Monaco.editor.setTheme("monaco-tree-sitter");
+    }
 
     if (!this.tag) {
       this.tag = document.createElement("style");

@@ -41,5 +41,5 @@ int main() {
     language: "cpp"
   });
 
-  window.monacoTreeSitter = new MonacoTreeSitter(editor, language);
+  window.monacoTreeSitter = new MonacoTreeSitter(Monaco, editor, language);
 })();

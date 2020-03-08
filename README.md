@@ -94,9 +94,12 @@ Theme.load(require("monaco-tree-sitter/themes/tomorrow"));
 })();
 ```
 
-Finally you can create your Monaco Editor and apply the highlight on it:
+Since this module provides highlighting both for Monaco Editor and without Monaco Editor. For better Webpack code splitting, we don't import `monaco-editor` module and you should provide the module you imported to us.
+
+Create your Monaco Editor and apply the highlight on it:
 
 ```ts
+import Monaco = require("monaco-editor");
 import Parser = require("web-tree-sitter");
 import { Theme, Language } from "monaco-tree-sitter";
 import treeSitterCpp from "./tree-sitter-cpp.wasm"; // Path to the language parser library WASM file
@@ -117,7 +120,7 @@ Theme.load(require("monaco-tree-sitter/themes/tomorrow"));
     language: "cpp"
   });  
 
-  const monacoTreeSitter = new MonacoTreeSitter(editor, language);
+  const monacoTreeSitter = new MonacoTreeSitter(Monaco, editor, language);
 
   // You can change the language with monacoTreeSitter.changeLanguage()
   // Or change the theme with Theme.load()
