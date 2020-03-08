@@ -15,13 +15,24 @@ function monacoPositionToParserPoint(position: Monaco.Position): Parser.Point {
   return { row: position.lineNumber, column: position.column };
 }
 
-export class MonacoTreeSitter {
+export class MonacoTreeSitter implements Monaco.IDisposable {
   private tree: Parser.Tree;
   private monacoDecorationKeys: string[] = [];
+  private buildHighlightDebounced: () => void;
+  public dispose: () => void;
 
-  constructor(public readonly editor: Monaco.editor.IStandaloneCodeEditor, private language: Language) {
+  constructor(
+    public readonly editor: Monaco.editor.IStandaloneCodeEditor,
+    private language: Language,
+    debounceUpdate: number = 15
+  ) {
     this.tree = language.parser.parse(editor.getValue());
-    editor.getModel().onDidChangeContent(this.onEditorContentChange.bind(this));
+    this.buildHighlightDebounced =
+      debounceUpdate == null ? this.buildHighlight : lodashDebounce(this.buildHighlight.bind(this), debounceUpdate);
+
+    const eventListener = editor.getModel().onDidChangeContent(this.onEditorContentChange.bind(this));
+    this.dispose = eventListener.dispose.bind(eventListener);
+
     this.buildHighlight();
   }
 
@@ -55,8 +66,6 @@ export class MonacoTreeSitter {
     }
     this.monacoDecorationKeys = this.editor.deltaDecorations(this.monacoDecorationKeys, monacoDecorations);
   }
-
-  private buildHighlightDebounced = lodashDebounce(this.buildHighlight.bind(this), 20);
 
   public changeLanguage(language: Language) {
     this.language = language;
