@@ -2,7 +2,7 @@ import { Theme } from "./theme";
 import { Language } from "./language";
 import { Term, terms, buildHighlightInfo } from "./highlighter";
 
-function escapeHtml(text: string, escapeQuotes: boolean = false) {
+export function escapeHtml(text: string, escapeQuotes: boolean = false) {
   text = text
     .split("&")
     .join("&amp;")
