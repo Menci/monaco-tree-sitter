@@ -3,15 +3,7 @@ import { Language } from "./language";
 import { Term, terms, buildHighlightInfo } from "./highlighter";
 
 export function escapeHtml(text: string, escapeQuotes: boolean = false) {
-  text = text
-    .split("&")
-    .join("&amp;")
-    .split("<")
-    .join("&lt;")
-    .split(">")
-    .join("&gt;")
-    .split(" ")
-    .join("&nbsp;");
+  text = text.split("&").join("&amp;").split("<").join("&lt;").split(">").join("&gt;").split(" ").join("&nbsp;");
   if (escapeQuotes) text = text.split('"').join("&quot;");
   return text;
 }

@@ -30,17 +30,22 @@ export class MonacoTreeSitter implements MonacoModule.IDisposable {
   ) {
     provideMonacoModule(Monaco);
 
-    this.tree = language.parser.parse(editor.getValue());
+    this.tree = language ? language.parser.parse(editor.getValue()) : null;
     this.buildHighlightDebounced =
       debounceUpdate == null ? this.buildHighlight : lodashDebounce(this.buildHighlight.bind(this), debounceUpdate);
 
     const eventListener = editor.getModel().onDidChangeContent(this.onEditorContentChange.bind(this));
-    this.dispose = eventListener.dispose.bind(eventListener);
+    this.dispose = () => {
+      eventListener.dispose();
+      this.language = this.tree = null;
+      this.buildHighlight();
+    };
 
     this.buildHighlight();
   }
 
   private onEditorContentChange(e: MonacoModule.editor.IModelContentChangedEvent) {
+    if (!this.language) return;
     if (e.changes.length == 0) return;
 
     for (const change of e.changes) {
@@ -57,23 +62,24 @@ export class MonacoTreeSitter implements MonacoModule.IDisposable {
   }
 
   private buildHighlight() {
-    const decorations = buildDecorations(this.tree, this.language);
+    const decorations = this.language ? buildDecorations(this.tree, this.language) : null;
 
     const monacoDecorations: MonacoModule.editor.IModelDeltaDecoration[] = [];
-    for (const [term, ranges] of Object.entries(decorations)) {
-      const options: MonacoModule.editor.IModelDecorationOptions = {
-        inlineClassName: Theme.getClassNameOfTerm(term as Term)
-      };
-      for (const range of ranges) {
-        monacoDecorations.push({ range, options });
+    if (decorations)
+      for (const [term, ranges] of Object.entries(decorations)) {
+        const options: MonacoModule.editor.IModelDecorationOptions = {
+          inlineClassName: Theme.getClassNameOfTerm(term as Term)
+        };
+        for (const range of ranges) {
+          monacoDecorations.push({ range, options });
+        }
       }
-    }
     this.monacoDecorationKeys = this.editor.deltaDecorations(this.monacoDecorationKeys, monacoDecorations);
   }
 
   public changeLanguage(language: Language) {
     this.language = language;
-    this.tree = language.parser.parse(this.editor.getValue());
+    this.tree = language ? language.parser.parse(this.editor.getValue()) : null;
     this.buildHighlight();
   }
 
