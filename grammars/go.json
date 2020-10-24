@@ -103,6 +103,6 @@
         "call_expression > identifier": "function",
         "function_declaration > identifier": "function",
         "method_declaration > field_identifier": "function",
-        "call_expression > selector_expression > field_identifier": "function",
+        "call_expression > selector_expression > field_identifier": "function"
     }
 }
